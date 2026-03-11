@@ -1,0 +1,350 @@
+"""
+ADVOCACY:
+Within C++, there is a much smaller and cleaner language struggling to get out.
+-- Bjarne Stroustrup
+There are two ways of constructing a software design: One way is to make
+it so simple that there are obviously no deficiencies, and the other way
+is to make it so complicated that there are no obvious deficiencies.
+The first method is far more difficult.
+-- C.A.R. Hoare
+CXX is an experimental programming language I have been working on, on and off (mostly off), since 2012. It is a statically typed, object-oriented, imperative language,
+As safe as ADA, as performant as C, as productive as Python.
+I tried hard to keep it c-like at the lowest level, while infusing it with python-isms at the highest level to make it more palatable to python users.
+The most important thing when coding is to keep code from collapsing under the weigth of its own complexity.
+#C++ my favourite example: f(a<b, c>d)
+#Does the f function has 2 bool arguments or do we pass (freshly created) object of class a parametrized with template arguments b,c? "Templates". Fun begins there :D
+I am a C-graded coder, couldn't convince myself of becoming D-graded
+In the same way my friend's car that maxes out at 80 is not fast but is still fast enough for standard driving.
+"""
+# THERE ARE 3 LEVELS OF VISIBILITY (caveat, must be preceded by NEWLINE ????)
+# 'public class' ==> all internals are made public
+# 'protected class' ==> only an opaque type is made public, Accessors must be defined
+# 'private class' ==> the type is only visible within the module
+# Order of Definitions Is Not Significant:No need of forward declarations, you can group definitions logically, not in an order forced by the limitations of the compiler.
+# done: arr= new TYPE[ROWS][COLS]
+#    TYPE *arr_p= calloc(ROWS*COLS,sizeof(TYPE))
+#    TYPE (*arr)[COLS]=(TYPE(*)[COLS])arr_p
+# done : turn  myobj := new Obj = {.a=1,.b=5}
+#   into: Obj* myobj := new Obj; *myobj= (Obj){.a=1,.b=5}
+# DONE: one cosmetic blank line is allowed between lines of same indentation!!
+# done: handle default parameters
+# done:fileobj := new FileObject ==>FileObject* fileobj = malloc(sizeof(*fileobj))
+# done: add static class parameters
+#done: if a class is protected, only the opaque type is exported in the .h file !
+# done class A:
+#     static int counter=0
+# done: namespace G: int a=8;... ==> struct {int a,..}  G={.a=8}
+# done: anonymous namespaces within namespaces !!! (use anonymous structs!)
+# limitation: anonymous namespaces are only allowed within a named namespace
+# done: for int x in gen:  ==>
+#       while not gen->exhausted:
+#           int x= gen->next()
+# done, allow blank lines between method definitions!!!
+# done replace 1_000_000 with 1000000
+# done  empty lines between same levels of indentation should be allowed
+# done add doc strings to the functions !!!
+# DONE: an __init__ function can fail and must then return a NULL pointer !!!
+# DONE a1 = new int[12] ==> int *a1= malloc(12*sizeof(int))
+# done designated_new: e.g MyClass* my = new Myclass(.a=10,.b=15)
+# done would translate into MyClass* my =DESIGNATE_NEW(Myclass,.a=10,.b=15)
+# #define D_NEW(T,...) memcpy(malloc(sizeof(T)),&(T const){__VA_ARGS__},sizeof(T))
+# done: RAII volatile fp:= new File(...)
+# ==> File* fp __attribute__((cleanup(File_free)))= File_new();
+# done: RAII volatile fp:= new double
+# ==> double* fp __attribute__((cleanup(free)))= malloc(sizeof(*fp));
+# done: delegate pointers
+# advice: NEVER USE CONSTANTS IN YOUR CODE
+# done: return new int[2] = {max_length, longest}
+# ====>return memcpy(calloc(2,sizeof(int)),(int[]) {max_length, longest});
+# DONE: improve base_processing to collapse multi-lines into one line!
+# SOLVED BUG, the __init__ declaration MUST be on a single line !!!!
+# done: allow volatile int* b=  fun()
+# done: implement a main class with constructor and destructor
+# done: add asserts for all pointer dereferencings!!!
+# done: var.startswith("ffff") ==> strncmp(var,"ffff",strlen("ffff"))==0
+# done: var=="ffff" ==> strncmp(var,"ffff",strlen("ffff"))==0
+#GENERATORS
+#   you can do 'yield' within the 'next' method and on the next call
+#   * control will resume just after the 'yield' statement.
+#   *  Any local variables must be declared as an instance member.
+#   *
+#   * Ground rules:
+#   *  - because of the use of labels, no local vars can be declared!!!
+#   *  - never put two 'yield' statements on the same
+#   *    source line.
+#   *  - if you want the output to be ignored, yield None
+#   *
+#   * The caller of a static coroutine calls it just as if it were an
+#   * ordinary method call:
+#done: call destructor of parent class if not __del__ defined in child class
+#done :     b := reshape(a,2,5) ==>int (*b)[5]=(int(*)[5])a_p
+#done :     b := reshape(int,a,2,5) ==>int (*b)[5]=(int(*)[5])a_p
+#done  : when use is made of "for char* p in array:", introduce
+#   #define append(sp, n) (*((sp)+1+(*(int*)(sp))++) = (n))
+#   #define pop(sp) ((sp)[--*(int*)(sp)+1])
+#  for char* p in array: do ...==> for int i=1;i<=array[0];i++: char*p=array[i]
+#  for char* p in array.reversed: do ...==> for int i=array[0];i>0;i--: char*p=array[i]
+#done: put G struct at the beginning of the file (with enums and #define declarations)
+#done: implement a "globals.h" to be able to split the main file into several files
+#      i call it "splitted main functionality"!
+#done: implement nested enums for ordinary classed (translates as nested !)
+#done: use '=>' for polymorphic calls
+#done: create a unitest file for the libraries (in a test directory)!!!
+#done: SOLVE THE BUG WITH THE PARENTHESES !!!!
+#done: with new char[255] as buf: ==> for char* buf=malloc(255),enter=1;enter;free(buf),enter=0:
+#      with new File(..) as f: ==> for f:=new File(..), enter=1;enter;delete f,enter=0:
+
+
+#TODO: implement PEP 0531 (existential operator)
+#TODO: demos "sunfish chess engine, tcl interpreter, google search engine"
+#TODO: use qo to replace the makefiles (https://github.com/andlabs/qo )!!!
+# TODO: include compile options and directives in the file itself !!!
+#TODO: refactor the code to make use of the rxb module !!!
+#todo: separate the transpiler from the Makefile generation
+#todo: transform 'if sig in [SIGTERM,SIGINT]:'  INTO 'if sig== SIGTERM or sig==SIGINT:'
+#todo: integrate SWIG
+#todo: add swig type annotations to cxx files !!! //%INPUT
+#todo: fixed makefile generation for splitted main functionality!
+#TODO: extract python unittest code to a separate file !!!
+#todo: use  :->  to indicate a polymorphic call !!!
+#todo: fix the typedef bug (see currying file)
+# todo: handle inline functions TO BE TESTED !!!!
+#todo: finish off the standard library //// use cmake
+# todo: add def __del__(self): super.__del__(self) when derived from class !!!
+#todo: add "return 0;" to the main of the unittests !!!
+# todo: add G pointers to symbol table !!!!
+# todo: SYMBOL TABLE
+# todo: implement symbol table, in order to do operations on strings(e.g. slicing)
+# todo: populate symbol table with function definition parameters !!!
+# todo: populate symbol table with function definition parameters for imported modules
+#todo: the constructor(__init__) of a class to be derived must be public,
+# especially a class of which one method is virtual !!!
+# advice: use sdl for games, Qt for GUI's
+#todo: test the insert macro (also make a get_and_delete macro) !!!
+# add asserts after or before each use of array indexing (when using annotated arrays!)
+#todo use std::list std::dict std::queue std::task std::string std::priorityQueue std::reactor std::channel
+#todo: put standard lib in zip file and extract as needed:
+#  linkedlist.cxx,preprocessor.h,CircularBuffer.cxx,hek_thread.cxx,hek_string.cxx, heapq.cxx,hek_mem.cxx
+#  cxx_dict.cxx, epoll_reactor.cxx, Channel.cxx(merge with hek_thread.cxx!!!)
+#todo; change case:: into case:
+#TODO: integrate with C++ (also generate corresponding makefile!!!)
+#todo: implement labeled break
+#todo: replace 'for i in range(n)' in 'for int i=0;i<n;i++'
+#todo include python interpreter into a cxx program !!!
+#todo: Schwartzian transform for linked lists| implement heap, queue and dict!!!
+#TODO: use nullfree in the destructor instead of free,
+#    and enforce that only a NULL pointer can be used in a malloc !!!
+# realloc() to only receive non-NULL pointers and for malloc() to only receive NULL ones !!!
+# MAKE USE OF RECALLOC
+#todo: incorporate plantUML (see plant.py)
+#todo: replace delete[] with free (to please c++ users!)
+#todo: implement David Beazley slides on generator tricks!
+#todo : implement struct inheritance
+#todo: in makefile, pkg-config as in stackoverflow.com/questions/19366064/how-to-compile-an-example-sdl-program-written-in-c
+#TODO: implement smart pointer(with reference count)
+#todo: write tetris game, pacman game
+# TODO: introduce a foreach construct, also "for int i in [a:b]"
+#  should become ==> for int i=a;i<b;i++
+#todo: first comment in the file (between /* and */) should be considered as docstring !!!
+#TODO: int {x,y} = function(...) ==> volatile int* res= function(...); int x=res[0],y=res[1];
+# in the function, return (int[]) x,y ==> res= new int[2];return res;
+#todo: delegate objects also for G class !!!
+#todo: pod struct inheritance
+#     in __init__ method, if self is assigned to, then add
+#       ==> transform: self=SDL_SetVideoMode(width, height, bpp, flags)
+#      into:
+#       free self // we don't need it anymore
+#       self=SDL_SetVideoMode(width, height, bpp, flags)
+#       if not self:
+#           return NULL
+#       self=realloc(self,sizeof *self)
+#       if not self:
+#           return NULL
+#       //
+#todo: implement generics/templates e.g. List<int,10> mylist !!!
+# example: Stack<int,10> mystack as  ==>NEW_LIST(int,mystack,10)
+#       mystack.push(555)  ==>
+#       mystack.pop()  ==>
+#       mystack.size() =>
+#       mystack.empty()  ==>
+#       mystack.full()  ==>
+#       for int i in mystack  ==>
+# example: int myqueue[10] as Queue
+#todo: convert uint16_t to uint_fast16_t (c99 feature!!!)
+#todo: generate a default constructor in a derived class if not called !!!
+#   def __init__(self):
+#       super.__init__(self)
+#   THE PROBLEM IS WHEN THERE ARE PARAMETERS. YOU HAVE TO GET THE CONSTRUCTOR
+#   PARAMETERS FROM THE PARENT CLASS DEFINITION possibly IN ANOTHER FILE !!!
+# todo: assert a>0 , "a must be positive" ==> replace ',' by '&&'
+# todo: add a method to reset the generator !!!!
+# todo: anonymous blocks
+#       ::
+#           print
+#           print
+#       this should trigger a { print; print''}
+# TODO: properties for getters and setters
+# class Cat:
+#    char name[100]:
+#        get:
+#            return name
+#        set:
+#            strcpy(name,value)
+#todo: data=yield from generator()
+#    ==> data=generator->next()
+#        if not generator->exhausted:
+#             yield data
+#todo: implement user-defined literals 1m 3s 4m_s
+#todo: object method reset(self):
+# ==>       HAL::destructor(self);HAL::constructor(self,self.tx_id, self.card_id, self.debug)
+"""
+The idea behind coroutines is that multiple functions can cooperate by yielding
+control to one another. JavaScript's generators are more limited, in that they
+can only pass control back to the caller. Still, this turns out to be enough,
+because we can introduce a coordinator function to pass control from the caller
+to any function we choose.
+This cooperation, in turn, allows us to do multiple tasks concurrently.
+"""
+"""
+transformers (pure functions)
+filters (stateful generators)
+newsource= source >> filter1 | transformer | filter2
+for int x in source:
+    int y= filter1->next(x)
+    if not filter1->valid_output:
+        continue
+    if not filter1->exhausted:
+        break
+    int w= transformer(y)
+    int z= filter2->next(w)
+    if not filter2->valid_output:
+        continue
+    yield z
+todo: combine with channels to exploit multicores !!!
+"""
+# todo: newsource= source >> processor1 | .... | processorN
+# todo: int x= source >> sink --> int x= sink(source)
+# todo: repeat until construct
+# todo: valType myhash[keyType]
+# becomes
+# #include "uthash.h"
+# struct myhashType:
+#     keyType _key
+#     valType _val
+#     UT_hash_handle hh
+# my_struct *myhash = NULL
+# todo: add ADA constrained types: int x constraint 0 < x < 9
+# TODO default parameters for virtual methods
+# BUG, doc strings may not contain empty lines !!!
+# todo implement clone method
+# todo: write the c++ wrapper !!!
+# todo: implement currying
+# todo: handle overloaded functions !!!
+# add a c++ mode
+# BUG :/* a single quote in the comment ' spoils everything */
+# add python-style comments
+# TODO: implement an Either class, e.g. Either(int x, bool y)
+# EXAMPLE: as a return value type
+# private Either<Exception, int> myfunction(....)
+############################    TODO's   ############################
+# 1. anonymous blocks (for RAAI in C++) with block: construct
+# 2. define constructor and destructor by this and ~this
+# 3. define map in the D way !!!
+#int b[char*];    // associative array b of ints that are
+#                  // indexed by an array of characters.
+#                  // The KeyType is char*
+#b["hello"] = 3;   // set value associated with key "hello" to 3
+#func(b["hello"]); // pass 3 as parameter to func()
+#Particular keys in an associative array can be removed with the remove function:
+#b.remove("hello");
+#
+#5. PYSTRING(yourstring)[2:4] ==> String::slice(yourstring,2,4)
+#6. PYDICT(yourhash)[ww]=7
+#7. PYLIST(yourlist)[1:8] ==> Vector::slice(yourlist,1,8)
+#8. for char c in PYSTRING(yourstring):  ==> for int i=0;i<strlen(yourstring);i++: char c=yourstring[i]
+#9. for int el in PYLIST(yourlist):  ==> for int i=0;i<Vector::len(yourlist);i++: int el=Vector::get(i)
+#10.for int key,char*value in PYDICT(yourdict):  ==> for int i=0;i<Hash::len(yourdict);i++: int key=..
+#
+"""
+try:
+    SSLFreeBuffer(&hashCtx))
+    ReadyHash(&SSLHashSHA1, &hashCtx))
+    SSLHashSHA1.update(&hashCtx, &clientRandom))
+    SSLHashSHA1.update(&hashCtx, &serverRandom))
+    SSLHashSHA1.update(&hashCtx, &signedParams))
+    SSLHashSHA1.final(&hashCtx, &hashOut)))
+except:
+    whatever
+else:
+    finish
+====> translates into:
+if !((err = SSLFreeBuffer(&hashCtx)) ||
+    (err = ReadyHash(&SSLHashSHA1, &hashCtx)) ||
+    (err = SSLHashSHA1.update(&hashCtx, &clientRandom)) ||
+    (err = SSLHashSHA1.update(&hashCtx, &serverRandom)) ||
+    (err = SSLHashSHA1.update(&hashCtx, &signedParams)) ||
+    (err = SSLHashSHA1.final(&hashCtx, &hashOut))) {
+   finish;
+fail:
+  whatever;
+}
+
+"""
+
+"""
+HOW A C++ program can make use of a CXX class?
+THIS SHOULD BE A .hxx FILE THAT CREATES A .hpp FILE FOR C++ consumption
+public extern "C":
+    #include "buf.h"
+
+public klass mybuf : public Buf:
+    mybuf(int x, int y):
+        Buf::constructor(self,x,y)
+    void clear():
+        Buf::clear(self)
+    bool printit():
+        return Buf::printit(self)
+    bool append(const char* p, unsigned c):
+        return Buf::append(self, p, c)
+
+The code is clean-C, ie C99 but in order to be compatible with C++, this
+means no designated initializers, no compound literals, and casting allocs.
+To take advantage of these features when having to use C++ libraries,
+i use extern "C" in all the generated c headers,
+compile all C code with a c compiler into object files and then the c++ code and
+the main with a c++ compiler and link it all together !!!
+"""
+"""
+HOW A CXX program can make use of a C++ class, e.g. Qtclass, defined in qtklass.h?
+Create qtklass_wrapper.h file, with the following contents
+
+#include "qtklass.h"
+struct Qtclass
+extern "C" int Qtclass_new(int x) { return new Qtclass(x); }
+extern "C" int Qtclass_foo(self, int i) { return self.foo(i); }
+extern "C" int Qtclass_del(self) { return ~Qtclass(); }
+
+
+"""
+
+# regular expressions to parse html
+# /(<.*?>|[^<]+)\s*/g    # get tags and text
+# /(\w+)="(.*?)"/g       # get attibutes
+##############################################################################
+# MODULE INHERITANCE OVERRIDE SOME FUNCTIONS
+'''
+import cxx_compiler
+orig_cxx_compiler = __import__('cxx_compiler')
+class CPP_compiler(cxx_compiler):
+    class __metaclass__(type):
+        def __new__(cls, name, bases, dct):
+            dct["__getattr__"] = lambda x, y: getattr(bases[0], y)
+            return type.__new__(cls, name, (object,), dct)
+    def lstat(self, arg):
+        print orig_cxx_compiler.lstat(arg)
+        return 6
+    def rmdir(self, arg):
+        raise self.error("No such file or directory: %r" % arg)
+compiler = CPP_compiler()
+'''
+#############################################################################
